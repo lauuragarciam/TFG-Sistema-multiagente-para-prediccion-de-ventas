@@ -72,17 +72,48 @@ El sistema desarrollado es un sistema multiagente que predice la demanda de prod
 
 ## 3. Requisitos funcionales
 
-| ID | Descripción | Prioridad | Sprint | Estado |
-|----|-------------|-----------|--------|--------|
-| RF-01 |  |  |  | Pendiente |
+| ID | Requisito | Descripción | Prioridad | Sprint | Estado | Dependencia |
+|----|-----------|-----------|--------|--------|--------|--------|
+| RF-01 | Análisis exploratorio automatizado | HAY QUE ESPECIFICAR QUE TABLAS CREA Y DONDE LAS GUARDA | Must |  | Pendiente | |
+
+| RF-02 | Preparación de datos | El sistema transformará los datos para para su consumo por los agentes. HAY QUE ESPECIFICAR MÁS | Must |  |Pendiente | |
+
+| RF-03 | Entrenamiento de agentes |  | Must |  | Pendiente | |
+
+| RF-04 | Entrenamiento de agente coordinador |  | Must |  | Pendiente | |
+
+| RF-05 | Predecir según temporalidad | Un agente especializado predecirá la cantidad de producto vendido en cada tienda basándose en las ventas previas, empleando su histórico reciente para capturar tendencias y patrones de estacionalidad  | Must |  | Pendiente | |
+
+| RF-06 | Predecir según precios | Un agente especializado analizará las modificaciones de precio, tales como descuentos o promociones, para estimar su efecto sobre el volumen de ventas, aportando una predicción sensible a estos cambios | Must |  | Pendiente | |
+
+| RF-07 | Predecir según eventos | Un agente especializado detectará si hay eventos especiales, festivos o fechas señaladas que puedan afectar a las ventas, generando una predicción que anticipe posibles picos de demanda asociados a estos factores | Must |  | Pendiente | |
+
+| RF-08 | Detectar demanda intermitente | Un agente especializado analizará si se trata de un producto que se vende de manera irregular y adapta su predicción a este tipo de comportamiento | Must |  | Pendiente | |
+
+| RF-09 | Combinar predicciones | El agente coordinador analizará el contexto de cada predicción y según este combina las predicciones parciales de los agentes anteriores para llegar a la predicción final más plausible  | Must |  | Pendiente | |
+
+| RF-10 | Devolver predicciones | El sistema devolverá en bloque las predicciones de todos los productos y tiendas del conjunto de datos de test | Must |  | Pendiente | |
+
+| RF-11 | Consultar predicción | El sistema devolvería la predicción individual de un producto en la tienda y fecha especificadas | Should |  | Pendiente | |
+
+| RF-12 | Comparar predicciones | El sistema comparará las predicciones con un modelo baseline para evaluar las mejoras obtenidas | Must |  | Pendiente | |
+
+
+
+
 
 ---
 
 ## 4. Requisitos no funcionales
 
-| ID | Descripción | Prioridad | Sprint | Estado |
-|----|-------------|-----------|--------|--------|
-| RNF-01 |  |  |  | Pendiente |
+| ID | Requisito | Descripción | Prioridad | Sprint | Estado |
+|----|-------------|-----------|--------|--------|--------|
+| RNF-01 |  |  |  |  | Pendiente |
+| RNF-02 |  |  |  |  | Pendiente |
+| RNF-03 |  |  |  |  | Pendiente |
+| RNF-04 |  |  |  |  | Pendiente |
+| RNF-05 |  |  |  |  | Pendiente |
+
 
 ---
 
