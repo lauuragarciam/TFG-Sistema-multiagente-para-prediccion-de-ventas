@@ -2,8 +2,7 @@
 
 **Proyecto:** Sistema multiagente para la predicción de ventas y optimización de inventario en retail
 **Autora:** Laura García Medina
-**Última actualización:** AAAA-MM-DD
-**Versión del documento:** 0.1 (borrador)
+**Última actualización:** 18-10-2026
 
 ---
 
