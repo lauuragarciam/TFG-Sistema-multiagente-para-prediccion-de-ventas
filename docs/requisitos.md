@@ -10,11 +10,32 @@
 
 ### 1.1 Propósito de este documento
 
-<!-- Qué recoge este documento y quién lo va a usar (tú, tus tutores, el tribunal). -->
+Este documento recoge los requisitos funcionales y no funcionales del sistema. Su objetivo es definir con claridad qué debe hacer el sistema y bajo qué condiciones de calidad, delimitar su alcance y servir de referencia durante todo el desarrollo.
+
+Cada requisito tiene un identificador único, una prioridad y un estado, de modo que pueda trazarse hasta las tareas de planificación, el código que lo implementa y las pruebas que lo verifican.
+
 
 ### 1.2 Alcance del sistema
 
-<!-- Qué hace y qué NO hace el sistema, en pocas líneas. Aquí conviene mencionar el horizonte de predicción y los modos de uso que decidas. -->
+El sistema desarrollado es un sistema multiagente que predice la demanda de productos en el sector retail a partir de datos históricos de ventas. Está compuesto por agentes especializados, cada uno centrado en un factor determinante de la demanda (temporal, precios, eventos y demanda intermitente), y por un agente coordinador que combina sus predicciones parciales en una predicción final según el contexto de cada caso.
+
+**El sistema incluye:**
+
+- El análisis exploratorio automatizado del dataset y la preparación de los datos para el entrenamiento de los agentes.
+- El entrenamiento de los agentes especializados y del agente coordinador.
+- La predicción de ventas diarias por producto y tienda [dentro de un horizonte de X días a partir del último dato disponible].
+- [Un modo de consulta que permite obtener la predicción de un producto, tienda y fecha o rango de fechas concretos.]
+- La evaluación del sistema frente a un modelo único de referencia (baseline), con el fin de valorar si el enfoque multiagente aporta mejoras.
+
+**El sistema no incluye:**
+
+- [Predicciones fuera del horizonte definido.]
+- [Reentrenamiento en línea ni actualización automática con datos nuevos.]
+- [Uso de fuentes de datos distintas del dataset M5 de Walmart.]
+- [Interfaz gráfica de usuario.]
+- La gestión de inventario en sí (reposición, pedidos o decisiones de compra). El sistema genera predicciones de demanda que podrían servir de base para ello.
+
+**Datos utilizados:** dataset M5 Forecasting (Walmart), con ventas diarias por producto y tienda, precios y calendario de eventos.
 
 ### 1.3 Definiciones y abreviaturas
 
@@ -87,4 +108,4 @@ Relaciona cada requisito con su tarjeta de Trello, el código que lo implementa 
 
 | Fecha | Versión | Cambio | Motivo |
 |-------|---------|--------|--------|
-| AAAA-MM-DD | 0.1 | Creación del documento |  |
+| 18-10-2026 | 0.1 | Creación del documento |  |
