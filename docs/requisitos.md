@@ -24,16 +24,14 @@ El sistema desarrollado es un sistema multiagente que predice la demanda de prod
 - El análisis exploratorio automatizado del dataset y la preparación de los datos para el entrenamiento de los agentes.
 - El entrenamiento de los agentes especializados y del agente coordinador.
 - La predicción de ventas diarias por producto y tienda [dentro de un horizonte de X días a partir del último dato disponible].
-- [Un modo de consulta que permite obtener la predicción de un producto, tienda y fecha o rango de fechas concretos.]
+- Un modo de consulta que permite obtener la predicción de un producto, tienda y fecha o rango de fechas concretos.
 - La evaluación del sistema frente a un modelo único de referencia (baseline), con el fin de valorar si el enfoque multiagente aporta mejoras.
 
 **El sistema no incluye:**
 
 - [Predicciones fuera del horizonte definido.]
-- [Reentrenamiento en línea ni actualización automática con datos nuevos.]
-- [Uso de fuentes de datos distintas del dataset M5 de Walmart.]
-- [Interfaz gráfica de usuario.]
-- La gestión de inventario en sí (reposición, pedidos o decisiones de compra). El sistema genera predicciones de demanda que podrían servir de base para ello.
+- Reentrenamiento en línea ni actualización automática con datos nuevos.
+- Uso de fuentes de datos distintas del dataset M5 de Walmart.
 
 **Datos utilizados:** dataset M5 Forecasting (Walmart), con ventas diarias por producto y tienda, precios y calendario de eventos.
 
@@ -84,8 +82,15 @@ El sistema desarrollado es un sistema multiagente que predice la demanda de prod
 | RF-08 | Detectar demanda intermitente | Un agente especializado analizará si se trata de un producto que se vende de manera irregular y adapta su predicción a este tipo de comportamiento | Must |  | Pendiente | |
 | RF-09 | Combinar predicciones | El agente coordinador analizará el contexto de cada predicción y según este combina las predicciones parciales de los agentes anteriores para llegar a la predicción final más plausible  | Must |  | Pendiente | |
 | RF-10 | Devolver predicciones | El sistema devolverá en bloque las predicciones de todos los productos y tiendas del conjunto de datos de test | Must |  | Pendiente | |
-| RF-11 | Consultar predicción | El sistema devolvería la predicción individual de un producto en la tienda y fecha especificadas | Should |  | Pendiente | |
-| RF-12 | Comparar predicciones | El sistema comparará las predicciones con un modelo baseline para evaluar las mejoras obtenidas | Must |  | Pendiente | |
+| RF-11 | Consultar predicción | El sistema devolvería la predicción individual de un producto en la tienda y fecha o intervalo de tiempo especificados | Should |  | Pendiente | |
+| RF-12 | Entrenamiento del modelo baseline |  | Must |  | Pendiente | |
+| RF-13 | Cálculo de métricas de evaluación |  | Must |  | Pendiente | |
+| RF-14 | Comparar predicciones | El sistema comparará las predicciones con un modelo baseline para evaluar las mejoras obtenidas | Must |  | Pendiente | |
+| RF-15 | Calcular stock de seguridad | El sistema calcularía el stock de seguridad para un producto y tienda suponiendo ciertos costes y plazos no incluidos en el dataset | Could |  | Pendiente | |
+| RF-16 | Devolver predicciones de todos los agentes especializados | El sistema devolvería las predicciones de cada agente especializado  | Should |  | Pendiente | |
+| RF-17 | Devolver los pesos asignados por el coordinador |  El sistema devolvería los pesos asignados y usados para el cálculo de la predicción final | Should |  | Pendiente | |
+| RF-18 | Visualización de predicciones frente a ventas reales | El sistema devolvería una gráfica visual donde se mostría la diferencia entre las predicciones y las ventas reales | Could |  | Pendiente | |
+| RF-19 | Guardar y cargar modelos entrenados |  | Should |  | Pendiente | |
 
 
 
