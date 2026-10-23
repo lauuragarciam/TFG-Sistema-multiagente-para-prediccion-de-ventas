@@ -63,8 +63,8 @@ El sistema desarrollado es un sistema multiagente que predice la demanda de prod
 
 | ID | Requisito | Descripción | Prioridad | Estado | Dependencia |
 |------|-----------|-----------|--------|--------|--------|
-| RF-01 | Análisis exploratorio automatizado | HAY QUE ESPECIFICAR QUE TABLAS CREA Y DONDE LAS GUARDA | Must | Pendiente | |
-| RF-02 | Preparación de datos | El sistema transformará los datos para su consumo por los agentes. HAY QUE ESPECIFICAR MÁS | Must |Pendiente | |
+| RF-01 | Análisis exploratorio automatizado | El sistema generará, a partir de los ficheros del datset, tablas resumen en formato CSV en `/output/eda/` y las figuras asociadas en formato PNG. Las tablas incluirán como mínimo: estadísticos de ventas por categoría, departamento y tienda; porcentaje de ceros por serie; clasificación de series según tipo de demanda; correlación entre variación de precio y ventas; ventas medias por día de la semana; ventas medias por evento y por día SNAP | Must | Pendiente | |
+| RF-02 | Preparación de datos | El sistema transformará los datos del M5 para su consumo por los agentes: conversión del formato ancho a largo, reducción del uso de memoria mediante tipos de datos eficientes, unión de ventas, precios y calendario en una única tabla, y almacenamiento del resultado en `/data/processed/` | Must |Pendiente | |
 | RF-03 | Entrenamiento de agentes | Los agentes aprenderán basándose en los datos de entrenamiento preparados específicamente para cada uno | Must | Pendiente | RF-01, RF-02|
 | RF-04 | Entrenamiento del agente coordinador | El agente coordinador aprenderá a asignar pesos a las predicciones de los agentes específicos según el contexto y utilizando los datos del conjunto de validación para no verse sesgado | Must | Pendiente | RF-03 |
 | RF-05 | Predecir según temporalidad | Un agente especializado predecirá la cantidad de producto vendido en cada tienda basándose en las ventas previas, empleando su histórico reciente para capturar tendencias y patrones de estacionalidad  | Must | Pendiente | RF-03 |
@@ -94,8 +94,8 @@ El sistema desarrollado es un sistema multiagente que predice la demanda de prod
 | RNF-01 | Precisión | Buscará minimizar el error lo máximo posible sin adaptarse a los datos | Must | Pendiente |
 | RNF-02 | Rendimiento | Minimizará el tiempo de predicción en la medida de lo posible | Must | Pendiente |
 | RNF-03 | Usabilidad | Los ficheros y salidas por consola serán legibles, bien estructurados, con nombres claros | Must | Pendiente |
-| RNF-04 | Mantenibilidad | El código estará comentado, sobre todo las partes más complejas, para facilitar la legibilidad y comprensión | Must | Pendiente |
-| RNF-05 |  |  |  | Pendiente |
+| RNF-04 | Mantenibilidad | El código estaría comentado, sobre todo las partes más complejas, para facilitar la legibilidad y comprensión | Should | Pendiente |
+| RNF-05 | Modularidad | Se podría añadir o quitar agentes especializados sin tocar el resto | Should | Pendiente |
 | RNF-06 |  |  |  | Pendiente |
 | RNF-07 |  |  |  | Pendiente |
 | RNF-08 |  |  |  | Pendiente |
