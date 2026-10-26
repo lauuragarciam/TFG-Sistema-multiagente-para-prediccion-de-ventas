@@ -81,7 +81,7 @@ El sistema desarrollado es un sistema multiagente que predice la demanda de prod
 | RF-16 | Guardar y cargar modelos entrenados | Se almacenarían los modelos entrenados, de modo que cada agente podría guardarse individualmente, además del sistema al completo  | Should | Pendiente | RF-04, RF-05 |
 | RF-17 | Interfaz | El sistema ofrecería una interfaz (por consola o gráfica) desde la que realizar las consultas de RF-11, RF-15, RF-16 y RF-17 | Could | Pendiente | RF-12 |
 | RF-18 | Cálculo de stock de seguridad | El sistema calculará el stock de seguridad de un producto y tienda a partir de la predicción y de costes y plazos ficticios o introducidos por consola, ya que el dataset no los contiene. Su finalidad es ilustrar la utilidad de la predicción, no realizar una gestión real de inventario. | Could | Pendiente | RF-12 |
-| RF-19 | Entrenamiento del modelo baseline | El sistema entrenará un modelo baseline: un único modelo global alimentado con todas las variables a la vez, entrenado sobre los mismos datos de entrenamiento y con la misma división temporal que el sistema multiagente | Must | Pendiente | RF-02 |
+| RF-19 | Entrenamiento del modelo baseline | El sistema entrenará un modelo baseline, es decir, un único modelo global alimentado con todas las variables a la vez, entrenado sobre los mismos datos de entrenamiento y con la misma división temporal que el sistema multiagente | Must | Pendiente | RF-02 |
 | RF-20 | Baselines simples de referencia | El sistema calcularía adicionalmente predictores simples de referencia como la media móvil | Could | Pendiente | RF-02 |
 | RF-21 | Cálculo de métricas de evaluación | El sistema calculará, para el sistema multiagente, el baseline y los predictores simples, las métricas RMSE, MAE y sesgo medio (*bias*) sobre el conjunto de test | Must | Pendiente | RF-12, RF-19, RF-20 |
 | RF-22 | Informe comparativo | El sistema generará un informe comparativo que contraponga las métricas del sistema multiagente con las del baseline, para evaluar las mejoras obtenidas | Must | Pendiente | RF-21 |
@@ -97,15 +97,17 @@ El sistema desarrollado es un sistema multiagente que predice la demanda de prod
 
 | ID | Requisito | Descripción | Prioridad | Estado |
 |----|-------------|-----------|--------|--------|
-| RNF-01 | Precisión | Buscará minimizar el error lo máximo posible sin adaptarse a los datos | Must | Pendiente |
+| RNF-01 | Precisión de la predicción | El sistema multiagente obtendrá, en el conjunto de test, un error (RMSE y MAE) menor o igual que el del baseline. El ajuste de hiperparámetros se realizará únicamente con entrenamiento y validación, y el conjunto de test se usará una sola vez para la evaluación final | Must | Pendiente |
 | RNF-02 | Rendimiento | Minimizará el tiempo de predicción en la medida de lo posible | Must | Pendiente |
-| RNF-03 | Usabilidad | Los ficheros y salidas por consola serán legibles, bien estructurados, con nombres claros | Must | Pendiente |
-| RNF-04 | Mantenibilidad | El código estaría comentado, sobre todo las partes más complejas, para facilitar la legibilidad y comprensión | Should | Pendiente |
-| RNF-05 | Modularidad | Se podría añadir o quitar agentes especializados sin tocar el resto | Should | Pendiente |
-| RNF-06 |  |  |  | Pendiente |
-| RNF-07 |  |  |  | Pendiente |
-| RNF-08 |  |  |  | Pendiente |
-
+| RNF-03 | Usabilidad | Los ficheros de salida tendrán formato CSV con columnas de nombres claros (`item_id`, `store_id`, `date`, `prediction`, ...). Los mensajes por consola serán comprensibles | Must | Pendiente |
+| RNF-04 | Mantenibilidad | El código estaría comentado, sobre todo las partes más complejas, para facilitar la legibilidad y comprensión | Could | Pendiente |
+| RNF-05 | Modularidad | Se podría añadir o quitar agentes especializados modificando únicamente la configuración y el módulo del agente, sin tocar el resto del sistema | Should | Pendiente |
+| RNF-06 | Reproducibilidad | Dos ejecuciones con la misma configuración y datos producirán los mismos resultados | Must | Pendiente |
+| RNF-07 | Eficiencia | El sistema funcionará completo en un equipo personal con 16 GB de RAM, para lo cual usará tipos de datos eficientes (`int16`, `float32`, `category`) y procesamiento por bloques cuando sea necesario | Must | Pendiente |
+| RNF-08 | Tolerancia a fallos | Fallo de un agente | Si un agente no pudiera producir predicción para una serie, el coordinador renormalizaría los pesos entre los agentes restantes en lugar de interrumpir la ejecución | Should | Pendiente |
+| RNF-09 | Legalidad del uso del dataset | El dataset M5 se utilizará de acuerdo con las condiciones de uso de la competición de Kaggle y exclusivamente con fines académicos. No se redistribuirán los datos originales en el repositorio | Must | Pendiente |
+| RNF-10 | Portabilidad | El sistema se ejecutaría en Windows, Linux y macOS con una versión de Python igual o superior a la que se fije en la documentación | Could | Pendiente |
+| RNF-11 | Documentación | El repositorio incluirá un README con instrucciones de instalación y ejecución, un manual de usuario y un manual técnico | Must | Pendiente |
 
 
 ---
@@ -115,6 +117,7 @@ El sistema desarrollado es un sistema multiagente que predice la demanda de prod
 | ID | Requisito | Descripción | Motivo |
 |----|-----------|-------------|--------|
 | RF-25 | Gestión de inventario | El sistema definiría el stock de seguridad de los datos, además de plazos de reposición, proveedores y costes asociados basandose en el dataset | No se disponen de los datos necesarios para realizar estos cálculos, por ello se propone como posible RF-15, pudiendo mostrar la aplicación y ventasjas que supondría este cálculo de ventas |
+| RF-30 | Reentrenamiento en línea | El sistema se reentrenaría automáticamente al recibir datos nuevos | Excede el alcance del proyecto y no es necesario para evaluar el enfoque multiagente |
 
 ---
 
@@ -122,7 +125,22 @@ El sistema desarrollado es un sistema multiagente que predice la demanda de prod
 
 Relaciona cada requisito con su tarjeta de Trello, el código que lo implementa y la prueba que lo verifica.
 
-| Requisito | Tarjeta Trello | Módulo / fichero | Prueba asociada |
-|-----------|----------------|------------------|-----------------|
-| RF-01 |  |  |  |
+| Requisito |  Módulo / fichero | Prueba asociada |
+|-----------|------------------|-----------------|
+| RF-01 |  |  | 
+| RF-02 |  |  |  
+| RF-03 |  |  |
+| RF-04 |  |  |  
+| RF-05 |  |  |  
+| RF-06 |  |  |  
+| RF-07 |  |  |  
+| RF-08 |  |  |  
+| RF-09 |  |  |  
+| RF-10 |  |  |  
+| RF-12 |  |  |
+| RF-19 |  |  |  
+| RF-21 |  |  |  
+| RF-22 |  |  |  
 
+
+*(Los requisitos Should y Could se añadirán a esta tabla cuando se decida implementarlos.)*
