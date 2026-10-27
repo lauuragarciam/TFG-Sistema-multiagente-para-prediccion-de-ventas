@@ -26,8 +26,8 @@ Este documento recoge los casos de uso del sistema. Cada caso de uso describe un
 
 | ID | Nombre | RF relacionados | Prioridad | Estado |
 |----|--------|-----------------|-----------|--------|
-| CU-01 | Preparar los datos | RF-02, RF-03, RNF-06, RNF-07 | Must | Pendiente |
-| CU-02 | | | | Pendiente |
+| CU-01 | Preparar los datos | RF-02, RF-03, RNF-06, RNF-07, RNF-09, RNF-12 | Must | Pendiente |
+| CU-02 | Realizar análisis exploratorio | RF-01, RNF-03, RNF-06, RNF-07, RNF-12 | Must | Pendiente |
 
 Estado: `Pendiente` · `En progreso` · `Completado` · `Descartado`
 Prioridad (MoSCoW): `Must` · `Should` · `Could`
@@ -38,7 +38,7 @@ Prioridad (MoSCoW): `Must` · `Should` · `Could`
 
 | Caso de uso | Relación | Caso de uso relacionado |
 |-------------|----------|-------------------------|
-| CU-xx | `«include»` / `«extend»` / precondición | CU-yy |
+| CU-02 | Precondición | CU-01 |
 
 ---
 
@@ -46,166 +46,30 @@ Prioridad (MoSCoW): `Must` · `Should` · `Could`
 
 ### CU-01: Preparar los datos
 
-| Campo | Contenido |
-|-------|-----------|
-| **ID** | CU-01 |
-| **Nombre** | Preparar los datos |
-| **Actor principal** | Analista |
-| **Actores secundarios** | Dataset M5 |
+| | |
+|---|---|
+| **Nombre del caso de uso** | Preparar los datos |
+| **Objetivo** | Transformar los ficheros del dataset en un conjunto de datos listo para consumir por los agentes, con división temporal en entrenamiento, validación y test, y con cada serie clasificada por tipo de demanda |
 | **Prioridad** | Must |
-| **Requisitos relacionados** | RF-02, RF-03, RNF-06, RNF-07 |
-| **Descripción** | El analista transforma los ficheros originales del M5 en un conjunto de datos listo para los agentes, con división temporal en entrenamiento, validación y test, y con cada serie clasificada por tipo de demanda |
-| **Disparador** | El analista ejecuta el comando de preparación de datos por consola |
-
-**Precondiciones**
-
-1. Los ficheros del dataset M5 están en la ruta especificada
-
-**Flujo principal**
-
-| Paso | Actor / Sistema | Acción |
-|------|-----------------|--------|
-| 1 | Analista | Ejecuta el comando de preparación de datos |
-| 2 | Sistema | Comprueba que existen los ficheros de entrada y que la configuración es válida |
-| 3 | Sistema | Lee los ficheros del dataset M5 |
-| 4 | Sistema | Convierte las ventas de formato ancho al largo usando tipos de datos eficientes |
-| 5 | Sistema | Trata los valores ausentes según los criterios establecidos para ellos |
-| 6 | Sistema | Une ventas, precios y calendario en una única tabla |
-| 7 | Sistema | Divide los datos en entrenamiento, validación y test | 
-| 8 | Sistema | Calcula ADI y CV² de cada serie exclusivamente con los datos de entrenamiento y la clasifica como suave, errática, intermitente o irregular |
-| 9 | Sistema | Genera las variables propias para cada agente a partir de los datos |
-| 10 | Sistema | Guarda los datos procesados y la clasificación de cada serie en `/data/processed/` |
-| 11 | Sistema | Informa por consola de que ha terminado y da un resumen con series, filas por conjunto y fechas de corte usadas |
-
-**Flujos alternativos**
-
-- **FA-1 (paso 10):** Ya existen datos procesados -> el sistema los sobreescribe (RNF-06)
-
-**Excepciones**
-
-- **EX-1 (paso 2):** Faltan ficheros de entrada -> el sistema indica por consola el error, especifica que ficheros faltan y donde esperaba encontrarlos
-- **EX-1 (pasos 4-5):** Memoria insuficiente -> procesa en bloques (RNF-07)  
-
-**Postcondiciones**
-
-1. Los datos procesados que necesitan los agentes están preparados en `/data/processed/`.
-2. Los ficheros originales del dataset M5 no se han alterado ni incluido al repositorio.
-
-**Relaciones**
-
-- `«include»`: Ninguna
-- `«extend»`: Ninguna
-
-**Notas**
-
-- EN **EX-1 (paso 4-5):** NO SE SI TAMBIEN PUEDE PONER QUE HACEMOS ALGO EN LA NUBE
+| **Precondiciones** | El analista ha descargado el dataset M5 de Kaggle |
+| **Postcondiciones** | 1. Los datos procesados y la clasificación de cada serie están en `/data/processed/` <br>2. Ninguna variable generada ni la clasificación usan información posterior a su fecha de corte <br>3. Los ficheros originales del dataset M5 no se han alterado ni incluido en el repositorio |
+| **Flujo de eventos** | 1. El analista ejecuta el comando de preparación de datos por consola <br>2. El sistema comprueba que los ficheros de entrada están en la ruta especificada y que la configuración es válida (alt 1, alt 2)<br>3. El sistema lee los ficheros del dataset M5 <br>4. El sistema convierte las ventas del formato ancho al largo usando tipos de datos eficientes (alt 3) <br>5. El sistema une ventas, precios y calendario en una única tabla (alt 3)<br>6. El sistema trata los precios ausentes, que corresponden a días previos a la disponibilidad del producto <br>7. El sistema divide los datos en entrenamiento, validación y test según las fechas establecidas <br>8. El sistema calcula ADI y CV² de cada serie y la clasifica según su demanda <br>9. El sistema genera las variables propias de cada agente a partir de los datos <br>10. El sistema guarda los datos procesados y la clasificación de series en `/data/processed/` (alt 4) <br>11. El sistema informa por consola de que ha terminado, con un resumen de series, filas por conjunto y fechas de corte usadas |
+| **Flujos alternativos** | 1) Faltan ficheros de entrada -> el sistema muestra un mensaje de error que indica qué ficheros faltan y dónde esperaba encontrarlos, y termina sin generar resultados <br>2) La configuración no es válida (fechas de corte solapadas, fuera del rango del dataset o con un conjunto vacío) -> el sistema muestra un mensaje de error con el motivo específico y termina <br>3) La memoria es insuficiente -> el sistema procesa los datos por bloques. Si aun así no es posible, muestra un mensaje indicando que se requiere más memoria y termina <br>4) Ya existen datos procesados de una ejecución anterior -> el sistema los sobrescribe |
+| **Requisitos no funcionales** | RNF-06 (Reproducibilidad): con la misma configuración y datos, el resultado es idéntico <br>RNF-07 (Eficiencia): el pico de memoria no supera los 5 GB en el equipo local <br>RNF-09 (Legalidad): el dataset se usa solo con fines académicos y no se redistribuye <br>RNF-12 (Ausencia de fuga de información): ningún dato posterior a la fecha de predicción se usa en el entrenamiento ni en la clasificación |
+| **Notas** | El caso de uso es independiente del entorno de ejecución (local o nube) |
 
 ---
 
-### CU-02: Realizar analisis exploratorio
+### CU-02: Realizar análisis exploratorio
 
-| Campo | Contenido |
-|-------|-----------|
-| **ID** | CU-02 |
-| **Nombre** | Realizar analisis exploratorio |
-| **Actor principal** | Analista |
-| **Actores secundarios** | Ninguno |
+| | |
+|---|---|
+| **Nombre del caso de uso** | Realizar análisis exploratorio |
+| **Objetivo** | Generar automáticamente tablas resumen y figuras que muestren los patrones de ventas, la demanda intermitente y la relación entre precios, ventas y calendario en el conjunto de entrenamiento |
 | **Prioridad** | Must |
-| **Requisitos relacionados** | RF-01, RNF-06, RNF-07 |
-| **Descripción** | El analista genera automáticamente tablas resumen y figuras que muestran los patrones de ventas, la demanda intermitente y la relacion entre precios, ventas y calendario |
-| **Disparador** | El analista ejecuta el comando de analisis exploratorio por consola |
-
-**Precondiciones**
-
-1. Los datos necesarios estan procesados en `/data/processed/`
-
-**Flujo principal**
-
-| Paso | Actor / Sistema | Acción |
-|------|-----------------|--------|
-| 1 | Analista | Ejecuta el comando de análisis exploratorio |
-| 2 | Sistema | Carga los datos |
-| 3 | Sistema | Calcula estadísticos de ventas por categoría, departamento y tienda|
-| 4 | Sistema | Resume la clasificación de series por tipo de demanda, indicando además el porcentaje de ceros de cada una |
-| 5 | Sistema | Calcula la correlación entre variación de precio y ventas |
-| 6 | Sistema | Calcula las ventas medias por día de la semana, por evento y SNAP |
-| 7 | Sistema | Guarda las tablas en CSV y las figuras en PNG en `/output/eda/` |
-| 8 | Sistema | Indica por consola que ha terminado el analisis, además de la ruta donde se encuentran los resultados obtenidos |
-
-
-**Flujos alternativos**
-
-- **FA-1 (paso 7):** Ya existen resultados de una ejecución anterior -> se sobreescriben (RF-06)
-
-**Excepciones**
-
-- **EX-1 (paso 3):** Memoria insuficiente -> procesa en bloques (RNF-07) 
-
-**Postcondiciones**
-
-1. Las tablas y figuras proporcionadas por el análisis están en `/output/eda/` 
-2. Los datos procesados no han sido modificados
-
-**Relaciones**
-
-- `«include»`: 
-- `«extend»`: 
-
-**Diagrama de secuencia** (opcional, recomendado en los casos complejos)
-
-**Notas**
-
-- MISMA DUDA QUE ANTES
-
----
-
-### CU-XX: Verbo + objeto
-
-| Campo | Contenido |
-|-------|-----------|
-| **ID** | CU-XX |
-| **Nombre** | |
-| **Actor principal** | |
-| **Actores secundarios** | |
-| **Prioridad** | Must / Should / Could |
-| **Requisitos relacionados** | RF-xx, RF-yy, RNF-zz |
-| **Descripción** | Una o dos frases con el objetivo del caso de uso. |
-| **Disparador** | Qué inicia el caso de uso (por ejemplo, comando por consola). |
-
-**Precondiciones**
-
-1. 
-2. 
-
-**Flujo principal**
-
-| Paso | Actor / Sistema | Acción |
-|------|-----------------|--------|
-| 1 | Actor | |
-| 2 | Sistema | |
-| 3 | Sistema | |
-
-**Flujos alternativos**
-
-- **FA-1 (paso N):** condición → qué ocurre.
-
-**Excepciones**
-
-- **EX-1 (paso N):** qué falla → cómo responde el sistema (indicar el RNF si aplica, por ejemplo RNF-08).
-
-**Postcondiciones**
-
-1. Estado final del sistema y ficheros generados (por ejemplo, rutas en `/output/`).
-
-**Relaciones**
-
-- `«include»`: 
-- `«extend»`: 
-
-**Diagrama de secuencia** (opcional, recomendado en los casos complejos)
-
-**Notas**
-
-- Supuestos, dudas abiertas o decisiones de diseño.
-
----
+| **Precondiciones** | CU-01 ejecutado correctamente, los datos procesados y la clasificación de series están en `/data/processed/` |
+| **Postcondiciones** | 1. Las tablas CSV y las figuras PNG del análisis están en `/output/eda/` <br>2. Los datos procesados no se han modificado <br>3. Los resultados se han calculado únicamente con el conjunto de entrenamiento |
+| **Flujo de eventos** | 1. El analista ejecuta el comando de análisis exploratorio por consola <br>2. El sistema carga los datos procesados (alt 1) <br>3. El sistema calcula estadísticos de ventas por categoría, departamento y tienda (alt 1) <br>4. El sistema resume la clasificación de series por tipo de demanda <br>5. El sistema calcula la correlación entre variación de precio y ventas <br>6. El sistema calcula las ventas medias por día de la semana, por evento y por día SNAP <br>7. El sistema guarda las tablas en CSV y las figuras en PNG en `/output/eda/` (alt 2) <br>8. El sistema indica por consola de que ha terminado y la ruta donde se encuentran los resultados |
+| **Flujos alternativos** | 1) La memoria es insuficiente -> el sistema procesa los datos por bloques. Si aun así no es posible, muestra un mensaje indicando que se requiere más memoria y termina <br>2) Ya existen resultados de una ejecución anterior -> el sistema los sobrescribe |
+| **Requisitos no funcionales** | RNF-03 (Usabilidad): los CSV tienen columnas con nombres claros y los mensajes por consola son comprensibles <br>RNF-06 (Reproducibilidad): con los mismos datos, el resultado es idéntico <br>RNF-07 (Eficiencia): el pico de memoria no supera los 5 GB en el equipo local <br>RNF-12 (Ausencia de fuga de información): el análisis no usa datos de validación ni de test, de modo que no influye en decisiones de diseño con información futura |
+| **Notas** | El caso de uso es independiente del entorno de ejecución (local o nube) |
