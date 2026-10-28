@@ -38,7 +38,7 @@ El sistema desarrollado es un sistema multiagente que predice la demanda de prod
 | Baseline | Modelo de referencia con el que se compara el sistema multiagente |
 | Serie | Secuencia temporal de ventas diarias de un producto en una tienda |
 | Demanda intermitente | Demanda con largos periodos sin ventas intercalados con picos irregulares |
-| ADI | *Average Demand Interval*: intervalo medio entre demandas no nulas |
+| ADI | *Average Demand Interval*: intervalo medio entre demandas no nulas (nº de periodos / nº de periodos con demanda no nula) |
 | CV² | Cuadrado del coeficiente de variación de las demandas no nulas; junto con ADI sirve para clasificar series (suave, errática, intermitente, irregular) |
 | RMSE / MAE | Error cuadrático medio (raíz) / error absoluto medio |
 | Fuga de información | Uso, durante el entrenamiento o la predicción, de información que no estaría disponible en el momento real de predecir |
@@ -73,8 +73,8 @@ El sistema desarrollado es un sistema multiagente que predice la demanda de prod
 | ID | Requisito | Descripción | Prioridad | Estado | Dependencia |
 |------|-----------|-----------|--------|--------|--------|
 | RF-01 | Análisis exploratorio automatizado | El sistema generará, a partir del conjunto de entrenamiento de los datos procesados, tablas resumen en formato CSV en `/output/eda/` y las figuras asociadas en formato PNG. Las tablas incluirán estadísticos de ventas por categoría, departamento y tienda, clasificación de series según tipo de demanda, correlación entre variación de precio y ventas, ventas medias por día de la semana, ventas medias por evento y por día SNAP | Must | Pendiente | RF-03 |
-| RF-02 | Preparación de datos | El sistema transformará los datos del M5 (fichero de ventas sales_train_evaluation, hasta el día 1941) para su consumo por los agentes: conversión del formato ancho a largo, reducción del uso de memoria mediante tipos de datos eficientes, unión de ventas, precios y calendario en una única tabla, tratamiento de los valores ausentes y generación de las variables propias de cada agente a partir de los datos. Los precios nulos corresponden a días en que el producto aún no estaba a la venta, por lo que esos días se excluiran de la tabla. Además, se dividirán los datos de forma temporal en entrenamiento, validación y test (por defecto, test = últimos 28 días, d_1914 a d_1941; validación = los 28 anteriores, d_1886 a d_1913; entrenamiento = el resto, d_1 a d_1885), con fechas de corte configurables. El resultado se almacenará en `/data/processed/` | Must | Pendiente | |
-| RF-03 | Clasificación de series por tipo de demanda | El sistema clasificará cada serie como suave, errática, intermitente o irregular a partir de ADI (nº de periodos / nº de periodos con demanda no nula) y CV² (cuadrado del coeficiente de variación de las demandas no nulas), calculados únicamente con el conjunto de entrenamiento y contando los periodos desde la primera fecha con precio registrado de cada producto en cada tienda (inicio de disponibilidad). Los umbrales serán ADI = 1,32 y CV² = 0,49, configurables. Si una serie no registra ninguna venta en el conjunto de entrenamiento, ADI y CV² no están definidos; en ese caso el sistema emitirá un aviso y la clasificará como intermitente. Si registra una única venta, CV² no se puede estimar y se tomará igual a 0. La clasificación se guardará en `/data/processed/` | Must | Pendiente | RF-02 |
+| RF-02 | Preparación de datos | El sistema transformará los datos del M5 para su consumo por los agentes: conversión del formato ancho a largo, reducción del uso de memoria mediante tipos de datos eficientes, unión de ventas, precios y calendario en una única tabla, tratamiento de los valores ausentes y generación de las variables propias de cada agente a partir de los datos. Los precios nulos corresponden a días en que el producto aún no estaba a la venta, por lo que esos días se excluiran de la tabla. Además, se dividirán los datos de forma temporal en entrenamiento, validación y test con fechas de corte configurables. El resultado se almacenará en `/data/processed/` | Must | Pendiente | |
+| RF-03 | Clasificación de series por tipo de demanda | El sistema clasificará cada serie como suave, errática, intermitente o irregular a partir de ADI y CV², calculados únicamente con el conjunto de entrenamiento y contando los periodos desde la primera fecha con precio registrado de cada producto en cada tienda (inicio de disponibilidad). El criterio de clasificación, con sus umbrales configurables y el tratamiento de los casos límite, se especificará en la documentación. La clasificación se guardará en `/data/processed/` | Must | Pendiente | RF-02 |
 | RF-04 | Entrenamiento de agentes | Los agentes aprenderán basándose en los datos de entrenamiento preparados específicamente para cada uno | Must | Pendiente | RF-02, RF-03 |
 | RF-05 | Entrenamiento del agente coordinador | El agente coordinador aprenderá a asignar pesos a las predicciones de los agentes especializados según el contexto. Se entrenará con las predicciones de los agentes sobre el conjunto de validación para no verse sesgado | Must | Pendiente | RF-06, RF-07, RF-08, RF-09 |
 | RF-06 | Predecir según temporalidad | Un agente especializado predecirá la cantidad de producto vendido en cada tienda basándose en las ventas previas, empleando su histórico reciente para capturar tendencias y patrones de estacionalidad  | Must | Pendiente | RF-04 |
@@ -96,6 +96,7 @@ El sistema desarrollado es un sistema multiagente que predice la demanda de prod
 | RF-22 | Informe comparativo | El sistema generará un informe comparativo que contraponga las métricas del sistema multiagente con las del baseline, para evaluar las mejoras obtenidas | Must | Pendiente | RF-21 |
 | RF-23 | Evaluación por segmentos | El sistema calcularía las métricas de RF-21 por segmentos: categoría, departamento, tienda y tipo de demanda | Could | Pendiente | RF-03, RF-12, RF-19, RF-20 |
 | RF-24 | Análisis de protagonismo de los agentes | El sistema calcularía los pesos medios asignados por el coordinador a cada agente según contexto y los presentaría en tablas y gráficas en `/output/` | Should | Pendiente | RF-11 |
+| RF-27 | Entrenamiento individual de un agente | El sistema permitirá entrenar un único agente especializado sin reentrenar los demás agentes ni el coordinador, y guardarlo para su uso posterior | Should | Pendiente | RF-04, RF-16 |
 
 
 
@@ -106,14 +107,14 @@ El sistema desarrollado es un sistema multiagente que predice la demanda de prod
 
 | ID | Requisito | Descripción | Prioridad | Estado |
 |----|-------------|-----------|--------|--------|
-| RNF-01 | Evaluación de la precisión | El sistema evaluará el error (RMSE y MAE) del sistema multiagente frente al del baseline en el conjunto de test. El ajuste de hiperparámetros se realizará únicamente con entrenamiento y validación, y el conjunto de test se usará una sola vez para la evaluación final | Must | Pendiente |
+| RNF-01 | Evaluación de la precisión | El sistema evaluará el error (RMSE y MAE) del sistema multiagente frente al del baseline en el conjunto de test. El ajuste de hiperparámetros de los agentes se realizará únicamente con el conjunto de entrenamiento, la validación se reservará para el coordinador y el conjunto de test se usará una sola vez para la evaluación final |
 | RNF-02 | Rendimiento | Minimizará el tiempo de predicción en la medida de lo posible | Must | Pendiente |
 | RNF-03 | Usabilidad | Los ficheros de salida tendrán formato CSV con columnas de nombres claros (`item_id`, `store_id`, `date`, `prediction`, ...). Los mensajes por consola serán comprensibles | Must | Pendiente |
 | RNF-04 | Mantenibilidad | El código estaría comentado, sobre todo las partes más complejas, para facilitar la legibilidad y comprensión | Could | Pendiente |
 | RNF-05 | Modularidad | Se podría añadir o quitar agentes especializados modificando únicamente la configuración y el módulo del agente, sin tocar el resto del sistema | Should | Pendiente |
 | RNF-06 | Reproducibilidad | Dos ejecuciones con la misma configuración y datos producirán los mismos resultados | Must | Pendiente |
 | RNF-07 | Eficiencia | La ejecución completa del sistema funcionará dentro de los límites de memoria del entorno de ejecución, para lo cual usará tipos de datos eficientes (`int16`, `float32`, `category`), formatos de almacenamiento columnares y procesamiento por bloques. En el equipo local (8 GB de RAM) el pico de memoria no superará los 5 GB; en un entorno en la nube (por ejemplo Kaggle o Google Colab), si se emplea para las ejecuciones más costosas, no superará la memoria disponible en dicho entorno. Como mínimo, la fase de predicción y las consultas se podrán ejecutar en el equipo local | Must | Pendiente |
-| RNF-08 | Tolerancia a fallos | Si un agente no pudiera producir predicción para una serie, el coordinador renormalizaría los pesos entre los agentes restantes en lugar de interrumpir la ejecución | Should | Pendiente |
+| RNF-08 | Tolerancia a fallos | Si un agente no estuviera disponible para el entrenamiento o no pudiera producir predicción para una serie, el coordinador renormalizaría los pesos entre los agentes restantes en lugar de interrumpir la ejecución, indicando los cambios por consola | Should | Pendiente |
 | RNF-09 | Legalidad del uso del dataset | El dataset M5 se utilizará de acuerdo con las condiciones de uso de la competición de Kaggle y exclusivamente con fines académicos. No se redistribuirán los datos originales en el repositorio | Must | Pendiente |
 | RNF-10 | Portabilidad | El sistema se ejecutaría en Windows, Linux y macOS con una versión de Python igual o superior a la que se fije en la documentación | Could | Pendiente |
 | RNF-11 | Documentación | El repositorio incluirá un README con instrucciones de instalación y ejecución, un manual de usuario y un manual técnico | Must | Pendiente |
@@ -156,3 +157,20 @@ Relaciona cada requisito con el código que lo implementa y la prueba que lo ver
 
 
 *(Los requisitos Should y Could se añadirán a esta tabla cuando se decida implementarlos)*
+
+
+---
+
+## Anexo A. Criterio de clasificación de series (requisito del dominio)
+
+Criterio de Syntetos, Boylan y Croston (2005). ADI y CV² están definidos en la sección 1.3. Los umbrales son configurables.
+
+| | CV² < 0,49 | CV² ≥ 0,49 |
+|---|---|---|
+| **ADI < 1,32** | Suave | Errática |
+| **ADI ≥ 1,32** | Intermitente | Irregular |
+
+**Casos límite**
+
+- Si una serie no tiene ningún día a la venta o no registra ninguna venta en el conjunto de entrenamiento, ADI y CV² no están definidos. El sistema emitirá un aviso y la clasificará como intermitente.
+- Si una serie registra una única venta, CV² no se puede estimar y se tomará igual a 0.
