@@ -21,10 +21,15 @@ Este documento recoge los casos de uso del sistema. Cada caso de uso describe un
 | CU-02 | Realizar análisis exploratorio | RF-01, RNF-03, RNF-06, RNF-07, RNF-12 | Must | Pendiente |
 | CU-03 | Entrenar el sistema multiagente | RF-04, RF-05, RF-16, RF-27, RNF-01, RNF-06, RNF-07, RNF-08, RNF-12 | Must | Pendiente |
 | CU-04 | Entrenar el modelo baseline | RF-19, RF-16, RNF-01, RNF-06, RNF-07, RNF-12 | Must | Pendiente |
-| CU-05 | Generar predicciones con el sistema multiagente | RF-10, RF-11, RF-12, RF-16, RNF-02, RNF-03, RNF-06, RNF-07, RNF-08, RNF-12 | Must | Pendiente |
+| CU-05 | Generar predicciones con el sistema multiagente | RF-06, RF-07, RF-08, RF-09, RF-10, RF-11, RF-12, RF-16, RNF-02, RNF-03, RNF-06, RNF-07, RNF-08, RNF-12 | Must | Pendiente |
 | CU-06 | Generar predicciones con el baseline | RF-19, RF-16, RNF-02, RNF-03, RNF-06, RNF-07, RNF-12 | Must | Pendiente |
 | CU-07 | Consultar predicciones | RF-13, RNF-02, RNF-03 | Should | Pendiente |
 | CU-08 | Consultar predicciones de los agentes | RF-14, RNF-03, RNF-08 | Should | Pendiente |
+| CU-09 | Visualizar predicciones frente a ventas reales | RF-15, RNF-03, RNF-06 | Could | Pendiente |
+| CU-10 | Evaluar y comparar sistemas | RF-21, RF-22, RNF-01, RNF-03, RNF-06 | Must | Pendiente |
+| CU-11 | Evaluar por segmentos | RF-23, RNF-01, RNF-03, RNF-06 | Could | Pendiente |
+| CU-12 | Analizar protagonismo de los agentes | RF-24, RNF-03, RNF-06 | Should | Pendiente |
+| CU-13 | Calcular stock de seguridad | RF-18, RNF-02, RNF-03 | Could | Pendiente |
 
 Estado: `Pendiente` · `En progreso` · `Completado` · `Descartado`
 Prioridad (MoSCoW): `Must` · `Should` · `Could`
@@ -44,7 +49,14 @@ Prioridad (MoSCoW): `Must` · `Should` · `Could`
 | CU-07 | Precondición | CU-06 (consulta del baseline) |
 | CU-08 | Precondición | CU-05 |
 | CU-08 | `«extend»` | CU-07 |
-
+| CU-09 | Precondición | CU-05 (visualización del sistema multiagente) |
+| CU-09 | Precondición | CU-06 (visualización del baseline) |
+| CU-10 | Precondición | CU-05, CU-06 |
+| CU-11 | Precondición | CU-05, CU-06 |
+| CU-11 | `«extend»` | CU-10 |
+| CU-12 | Precondición | CU-05 |
+| CU-13 | Precondición | CU-05 (cálculo con el sistema multiagente) |
+| CU-13 | Precondición | CU-06 (cálculo con el baseline) |
 
 
 ---
@@ -76,7 +88,7 @@ Prioridad (MoSCoW): `Must` · `Should` · `Could`
 | **Prioridad** | Must |
 | **Precondiciones** | CU-01 ejecutado correctamente, los datos procesados y la clasificación de series están en `/data/processed/` |
 | **Postcondiciones** | 1. Las tablas CSV y las figuras PNG del análisis están en `/output/eda/` <br>2. Los datos procesados no se han modificado <br>3. Los resultados se han calculado únicamente con el conjunto de entrenamiento |
-| **Flujo de eventos** | 1. El analista ejecuta el comando de análisis exploratorio por consola <br>2. El sistema carga los datos procesados (alt 1) <br>3. El sistema calcula estadísticos de ventas por categoría, departamento y tienda (alt 1) <br>4. El sistema resume la clasificación de series por tipo de demanda <br>5. El sistema calcula la correlación entre variación de precio y ventas <br>6. El sistema calcula las ventas medias por día de la semana, por evento y por día SNAP <br>7. El sistema guarda las tablas en CSV y las figuras en PNG en `/output/eda/` (alt 2) <br>8. El sistema indica por consola de que ha terminado y la ruta donde se encuentran los resultados |
+| **Flujo de eventos** | 1. El analista ejecuta el comando de análisis exploratorio por consola <br>2. El sistema carga los datos procesados (alt 1) <br>3. El sistema calcula estadísticos de ventas por categoría, departamento y tienda (alt 1) <br>4. El sistema resume la clasificación de series por tipo de demanda <br>5. El sistema calcula la correlación entre variación de precio y ventas <br>6. El sistema calcula las ventas medias por día de la semana, por evento y por día SNAP <br>7. El sistema guarda las tablas en CSV y las figuras en PNG en `/output/eda/` (alt 2) <br>8. El sistema informa por consola de que ha terminado e indica la ruta de los resultados |
 | **Flujos alternativos** | 1) La memoria es insuficiente -> el sistema procesa los datos por bloques. Si aun así no es posible, muestra un mensaje indicando que se requiere más memoria y termina <br>2) Ya existen resultados de una ejecución anterior -> el sistema los sobrescribe |
 | **Requisitos no funcionales** | RNF-03 (Usabilidad): los CSV tienen columnas con nombres claros y los mensajes por consola son comprensibles <br>RNF-06 (Reproducibilidad): con los mismos datos, el resultado es idéntico <br>RNF-07 (Eficiencia): el pico de memoria no supera los 5 GB en el equipo local <br>RNF-12 (Ausencia de fuga de información): el análisis no usa datos de validación ni de test, de modo que no influye en decisiones de diseño con información futura |
 | **Notas** | El caso de uso es independiente del entorno de ejecución (local o nube) |
@@ -123,7 +135,7 @@ Prioridad (MoSCoW): `Must` · `Should` · `Could`
 | **Nombre del caso de uso** | Generar predicciones con el sistema multiagente |
 | **Objetivo** | Generar las predicciones de ventas diarias por producto y tienda sobre el conjunto de test, combinando las predicciones de los agentes especializados según el contexto |
 | **Prioridad** | Must |
-| **Precondiciones** | CU-01 y CU-03 ejecutados correctamente: los datos procesados están en `/data/processed/` y los modelos del sistema multiagente están guardados |
+| **Precondiciones** | CU-03 ejecutado correctamente: los modelos del sistema multiagente están guardados |
 | **Postcondiciones** | 1. Las predicciones de todos los productos y tiendas del conjunto de test están en `/output/`, con una fila por producto, tienda y día <br>2. Las predicciones parciales de cada agente y los pesos asignados por el coordinador están guardados <br>3. Ninguna predicción utiliza información posterior a su fecha de predicción <br>4. Los datos procesados y los modelos no se han modificado |
 | **Flujo de eventos** | 1. El analista ejecuta el comando de predicción del sistema multiagente por consola <br>2. El sistema carga los modelos del sistema multiagente y los datos del conjunto de test (alt 3) <br>3. Cada agente especializado genera su predicción parcial para cada serie y fecha (alt 1, alt 3) <br>4. El coordinador analiza el contexto de cada predicción y asigna un peso a cada agente (alt 1) <br>5. El coordinador combina las predicciones parciales ponderadas en la predicción final <br>6. El sistema guarda en `/output/` las predicciones finales, las predicciones parciales de cada agente y los pesos asignados (alt 2) <br>7. El sistema informa por consola de que ha terminado e indica la ruta de los resultados |
 | **Flujos alternativos** | 1) Un agente no puede producir predicción para una serie -> el coordinador renormaliza los pesos entre los agentes restantes, el sistema indica por consola qué agente ha fallado y la ejecución continúa <br>2) Ya existen predicciones del sistema multiagente de una ejecución anterior -> el sistema las sobrescribe <br>3) La memoria es insuficiente -> el sistema procesa los datos por bloques. Si aun así no es posible, muestra un mensaje indicando que se requiere más memoria y termina |
@@ -141,7 +153,7 @@ Prioridad (MoSCoW): `Must` · `Should` · `Could`
 | **Nombre del caso de uso** | Generar predicciones con el baseline |
 | **Objetivo** | Generar con el modelo baseline las predicciones de ventas diarias por producto y tienda sobre el conjunto de test, con el mismo formato y horizonte que las del sistema multiagente |
 | **Prioridad** | Must |
-| **Precondiciones** | CU-01 y CU-04 ejecutados correctamente: los datos procesados están en `/data/processed/` y el modelo baseline está guardado |
+| **Precondiciones** | CU-04 ejecutado correctamente: el modelo baseline está guardado |
 | **Postcondiciones** | 1. Las predicciones de todos los productos y tiendas del conjunto de test están en `/output/`, con una fila por producto, tienda y día, diferenciadas de las del sistema multiagente <br>2. Ninguna predicción utiliza información posterior a su fecha de predicción <br>3. Los datos procesados y el modelo no se han modificado |
 | **Flujo de eventos** | 1. El analista ejecuta el comando de predicción del baseline por consola <br>2. El sistema carga el modelo baseline y los datos del conjunto de test (alt 2) <br>3. El modelo genera la predicción para cada serie y fecha (alt 2) <br>4. El sistema guarda las predicciones en `/output/` (alt 1) <br>5. El sistema informa por consola de que ha terminado e indica la ruta de los resultados |
 | **Flujos alternativos** | 1) Ya existen predicciones del baseline de una ejecución anterior -> el sistema las sobrescribe, sin afectar a las del sistema multiagente <br>2) La memoria es insuficiente -> el sistema procesa los datos por bloques. Si aun así no es posible, muestra un mensaje indicando que se requiere más memoria y termina |
@@ -195,9 +207,79 @@ Prioridad (MoSCoW): `Must` · `Should` · `Could`
 | **Nombre del caso de uso** | Visualizar predicciones frente a ventas reales |
 | **Objetivo** | Generar una gráfica que compare, para cada fecha del conjunto de test, las ventas reales con las predicciones de uno o ambos modelos, para una serie concreta o para un subconjunto de series filtrado por producto, tienda, categoría, departamento o estado |
 | **Prioridad** | Could |
-| **Precondiciones** | CU-01 ejecutado correctamente y se han generado las predicciones de cada modelo que se quiere visualizar: CU-05 para el sistema multiagente o CU-06 para el baseline |
+| **Precondiciones** | Se han generado las predicciones de cada modelo que se quiere visualizar: CU-05 para el sistema multiagente o CU-06 para el baseline |
 | **Postcondiciones** | 1. La gráfica en formato PNG está en `/output/graficas/` <br>2. Los ficheros de predicciones y los datos procesados no se han modificado |
 | **Flujo de eventos** | 1. El analista ejecuta el comando de visualización por consola, indicando el modelo o los modelos, el intervalo de fechas y la serie o los filtros por producto, tienda, categoría, departamento o estado (alt 1) <br>2. El sistema comprueba que los parámetros son correctos y que las fechas están dentro del horizonte disponible (alt 1, alt 3) <br>3. El sistema lee las predicciones almacenadas de los modelos indicados y las ventas reales del conjunto de test, y selecciona las que cumplen los filtros y las fechas (alt 2) <br>4. El sistema genera la gráfica que compara, para cada fecha, las ventas reales con las predicciones de cada modelo; si la selección comprende varias series, representa la suma de todas ellas <br>5. El sistema guarda la gráfica en `/output/graficas/` (alt 4) <br>6. El sistema informa por consola de que ha terminado e indica la ruta de la gráfica |
 | **Flujos alternativos** | 1) Falta algún parámetro obligatorio o tiene un formato incorrecto -> el sistema muestra un mensaje de uso con los parámetros esperados y termina <br>2) Ningún dato cumple los filtros (un valor inexistente o una combinación sin series) -> el sistema muestra un mensaje indicándolo y termina <br>3) Alguna fecha está fuera del horizonte disponible -> el sistema muestra un mensaje con el rango de fechas disponible y termina <br>4) Ya existe una gráfica con el mismo nombre de una ejecución anterior -> el sistema la sobrescribe |
 | **Requisitos no funcionales** | RNF-03 (Usabilidad): los mensajes por consola son comprensibles y la gráfica indica claramente la selección, los modelos y las fechas <br>RNF-06 (Reproducibilidad): con las mismas predicciones y parámetros, la gráfica es idéntica |
-| **Notas** | |
+
+
+---
+
+
+### CU-10: Evaluar y comparar sistemas
+
+| | |
+|---|---|
+| **Nombre del caso de uso** | Evaluar y comparar sistemas |
+| **Objetivo** | Calcular las métricas de error del sistema multiagente y del baseline sobre el conjunto de test y generar un informe comparativo que permita valorar si el enfoque multiagente aporta mejoras |
+| **Prioridad** | Must |
+| **Precondiciones** | CU-05 y CU-06 ejecutados correctamente: las predicciones del sistema multiagente y del baseline sobre el conjunto de test están en `/output/` |
+| **Postcondiciones** | 1. El informe comparativo y la tabla de métricas de cada modelo están en `/output/evaluacion/` <br>2. Las métricas se han calculado sobre el conjunto de test completo <br>3. Las predicciones y los datos procesados no se han modificado |
+| **Flujo de eventos** | 1. El analista ejecuta el comando de evaluación por consola <br>2. El sistema carga las predicciones de ambos modelos y los datos procesados (ventas históricas y reales, y precios) <br>3. El sistema comprueba que las predicciones de ambos modelos cubren las mismas series y fechas (alt 1) <br>4. El sistema calcula, para cada modelo, el RMSE, el MAE, el sesgo medio y el WRMSSE sobre el conjunto de test <br>5. El sistema genera el informe comparativo, que contrapone las métricas de ambos modelos <br>6. El sistema guarda el informe y la tabla de métricas en `/output/evaluacion/` (alt 2) <br>7. El sistema informa por consola de que ha terminado, con un resumen de las métricas de cada modelo y la ruta del informe |
+| **Flujos alternativos** | 1) Las predicciones de ambos modelos no cubren las mismas series y fechas -> el sistema muestra un mensaje que indica la discrepancia y termina sin generar el informe <br>2) Ya existe un informe de una ejecución anterior -> el sistema lo sobrescribe |
+| **Requisitos no funcionales** | RNF-01 (Evaluación de la precisión): el conjunto de test se utiliza solo para esta evaluación final y nunca para ajustar los modelos <br>RNF-03 (Usabilidad): la tabla de métricas es un CSV con columnas de nombres claros y los mensajes por consola son comprensibles <br>RNF-06 (Reproducibilidad): con las mismas predicciones y datos, las métricas y el informe son idénticos |
+
+
+---
+
+
+### CU-11: Evaluar por segmentos
+
+| | |
+|---|---|
+| **Nombre del caso de uso** | Evaluar por segmentos |
+| **Objetivo** | Ampliar la evaluación de CU-10 calculando las métricas de error de cada modelo por segmentos de series (categoría, departamento, tienda y tipo de demanda), para identificar en qué tipos de series mejora o empeora el sistema multiagente respecto al baseline |
+| **Prioridad** | Could |
+| **Precondiciones** | CU-05 y CU-06 ejecutados correctamente: las predicciones de ambos modelos están en `/output/` |
+| **Postcondiciones** | 1. La tabla de métricas por segmento está en `/output/evaluacion/` y su resumen se ha añadido al informe comparativo <br>2. Las métricas globales de CU-10, las predicciones y los datos procesados no se han modificado |
+| **Flujo de eventos** | 1. En una evaluación de CU-10, el analista solicita el desglose por segmentos, indicando opcionalmente las dimensiones; si no indica ninguna, se usan todas (alt 1) <br>2. El sistema asigna cada serie a su categoría, departamento, tienda y tipo de demanda <br>3. El sistema calcula, para cada modelo y cada segmento, el RMSE, el MAE, el sesgo medio y el WRMSSE por segmento (alt 2) <br>4. El sistema guarda la tabla de métricas por segmento en `/output/evaluacion/` y añade su resumen al informe comparativo |
+| **Flujos alternativos** | 1) La dimensión indicada no existe -> el sistema muestra las dimensiones disponibles y termina el desglose, sin afectar a la evaluación de CU-10 <br>2) Un segmento no contiene ninguna serie -> el sistema lo indica en la tabla como sin series y continúa con los demás |
+| **Requisitos no funcionales** | RNF-01 (Evaluación de la precisión): el conjunto de test se utiliza solo para la evaluación final <br>RNF-03 (Usabilidad): la tabla es un CSV con columnas de nombres claros <br>RNF-06 (Reproducibilidad): con las mismas predicciones y datos, las métricas son idénticas |
+| **Notas** | El tipo de demanda es el calculado en CU-01 con el conjunto de entrenamiento, y no se recalcula con los datos de test <br> El WRMSSE por segmento es una adaptación de la métrica de M5 y no equivale al WRMSSE global de CU-10 |
+
+
+---
+
+
+### CU-12: Analizar protagonismo de los agentes
+
+| | |
+|---|---|
+| **Nombre del caso de uso** | Analizar protagonismo de los agentes |
+| **Objetivo** | Calcular los pesos medios que el coordinador asigna a cada agente, en conjunto y según las variables de contexto, y presentarlos en tablas y gráficas para entender en qué situaciones toma protagonismo cada agente |
+| **Prioridad** | Should |
+| **Precondiciones** | CU-05 ejecutado correctamente: las predicciones parciales de los agentes y los pesos asignados por el coordinador están en `/output/` |
+| **Postcondiciones** | 1. Las tablas CSV y las gráficas PNG del análisis están en `/output/protagonismo/` <br>2. Los ficheros de predicciones y pesos y los datos procesados no se han modificado |
+| **Flujo de eventos** | 1. El analista ejecuta el comando de análisis de protagonismo por consola <br>2. El sistema carga los pesos asignados por el coordinador y las variables de contexto de cada predicción <br>3. El sistema calcula, para cada agente, el peso medio global y el peso medio en cada valor de cada variable de contexto (por ejemplo, día de la semana, existencia de evento, día SNAP, variación de precio y tipo de demanda), junto con el número de observaciones en que se basa cada valor <br>4. El sistema genera las tablas y las gráficas de los pesos medios <br>5. El sistema guarda las tablas en CSV y las gráficas en PNG en `/output/protagonismo/` (alt 1) <br>6. El sistema informa por consola de que ha terminado, con el agente de mayor peso medio global y la ruta de los resultados |
+| **Flujos alternativos** | 1) Ya existen resultados de una ejecución anterior -> el sistema los sobrescribe |
+| **Requisitos no funcionales** | RNF-03 (Usabilidad): los CSV tienen columnas con nombres claros, las gráficas son legibles y los mensajes por consola son comprensibles <br>RNF-06 (Reproducibilidad): con los mismos pesos y datos, los resultados son idénticos |
+| **Notas** | Solo se analizan los agentes con los que se entrenó el coordinador. Este caso de uso analiza los pesos asignados, no la precisión de cada agente |
+
+
+---
+
+
+### CU-13: Calcular stock de seguridad
+
+| | |
+|---|---|
+| **Nombre del caso de uso** | Calcular stock de seguridad |
+| **Objetivo** | Calcular el stock de seguridad de un producto en una tienda a partir de las predicciones del modelo que indique el analista, de su error sobre el conjunto de test y de un plazo de reposición y unos costes ficticios o introducidos por consola, para ilustrar la utilidad de la predicción |
+| **Prioridad** | Could |
+| **Precondiciones** | Se han generado las predicciones del modelo que se quiere utilizar: CU-05 para el sistema multiagente o CU-06 para el baseline |
+| **Postcondiciones** | 1. El stock de seguridad calculado, la demanda prevista durante el plazo de reposición y los parámetros utilizados se han mostrado por consola <br>2. Los ficheros de `/output/` y los datos procesados no se han modificado |
+| **Flujo de eventos** | 1. El analista ejecuta el comando de cálculo de stock de seguridad por consola, indicando el modelo, el producto, la tienda y, opcionalmente, el plazo de reposición y los costes; los parámetros que no indique se toman de valores ficticios por defecto de la configuración (alt 1) <br>2. El sistema comprueba que los parámetros son correctos, que la serie existe en las predicciones y que el plazo no supera el horizonte disponible (alt 1, alt 2, alt 3) <br>3. El sistema lee de `/output/` las predicciones de esa serie del modelo indicado y las ventas reales de esa serie en el conjunto de test <br>4. El sistema calcula la demanda prevista durante el plazo de reposición, desde el primer día del horizonte de predicción <br>5. El sistema calcula el error de predicción de la serie sobre el conjunto de test y, a partir de él, el stock de seguridad según el criterio documentado <br>6. El sistema muestra por consola el stock de seguridad, la demanda prevista en el plazo y los parámetros utilizados, indicando cuáles son valores ficticios por defecto |
+| **Flujos alternativos** | 1) Falta algún parámetro obligatorio, tiene un formato incorrecto o un valor no válido (plazo o costes no positivos) -> el sistema muestra un mensaje de uso con los parámetros esperados y termina <br>2) El producto o la tienda no existen en las predicciones -> el sistema muestra un mensaje indicándolo y termina <br>3) El plazo de reposición supera el horizonte disponible -> el sistema muestra un mensaje con el máximo permitido y termina |
+| **Requisitos no funcionales** | RNF-02 (Rendimiento): el cálculo se resuelve sobre las predicciones almacenadas, sin volver a predecir <br>RNF-03 (Usabilidad): los mensajes por consola son comprensibles |
+| **Notas** | Su finalidad es ilustrar la utilidad de la predicción, no realizar una gestión real de inventario: el dataset no contiene costes ni plazos (RF-25, fuera de alcance), por lo que son ficticios o los introduce el analista |
