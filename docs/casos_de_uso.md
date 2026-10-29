@@ -9,7 +9,7 @@ Este documento recoge los casos de uso del sistema. Cada caso de uso describe un
 ## 2. Diagrama de casos de uso
 
 <!-- Insertar imagen exportada desde draw.io / PlantUML -->
-![Diagrama de casos de uso](diagramas/diagrama_casos_de_uso.png)
+![Diagrama de casos de uso](Diagramas/diagrama_casos_de_uso.png)
 
 ---
 
