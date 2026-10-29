@@ -1,0 +1,52 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Analista" as analista
+
+package "Sistema de Predicción Multiagente" {
+
+    package "Fase 1: Preparación" {
+        usecase "CU-01: Preparar los datos" as CU01
+        usecase "CU-02: Realizar análisis exploratorio" as CU02
+    }
+
+    package "Fase 2: Entrenamiento" {
+        usecase "CU-03: Entrenar el sistema multiagente" as CU03
+        usecase "CU-04: Entrenar el modelo baseline" as CU04
+    }
+
+    package "Fase 3: Predicción" {
+        usecase "CU-05: Generar predicciones\n(sistema multiagente)" as CU05
+        usecase "CU-06: Generar predicciones\n(baseline)" as CU06
+    }
+
+    package "Fase 4: Consultas y Evaluación" {
+        usecase "CU-07: Consultar predicciones" as CU07
+        usecase "CU-08: Consultar predicciones\nde los agentes" as CU08
+        usecase "CU-09: Visualizar predicciones\nfrente a ventas reales" as CU09
+        usecase "CU-10: Evaluar y comparar sistemas" as CU10
+        usecase "CU-11: Evaluar por segmentos" as CU11
+        usecase "CU-12: Analizar protagonismo\nde los agentes" as CU12
+        usecase "CU-13: Calcular stock de seguridad" as CU13
+    }
+}
+
+' --- Relaciones del Actor principal ---
+analista --> CU01
+analista --> CU02
+analista --> CU03
+analista --> CU04
+analista --> CU05
+analista --> CU06
+analista --> CU07
+analista --> CU09
+analista --> CU10
+analista --> CU12
+analista --> CU13
+
+' --- Relaciones de Extensión (<<extend>>) ---
+CU08 .> CU07 : <<extend>>
+CU11 .> CU10 : <<extend>>
+
+@enduml
