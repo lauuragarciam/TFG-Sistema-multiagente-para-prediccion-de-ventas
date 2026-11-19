@@ -1,0 +1,47 @@
+# Configuración del sistema multiagente (TFG M5).
+# Las rutas son relativas a la raíz del repositorio.
+
+[rutas]
+raw = "data/raw"
+interim = "data/interim"
+processed = "data/processed"
+eda = "output/eda"
+
+# División temporal (RF-02, RNF-12). Fechas de corte inclusivas: cada una es el
+# último día del conjunto. Train empieza en el primer día del dataset;
+# validación y test empiezan el día siguiente al corte anterior.
+[division]
+fin_train = 2016-01-31        # d_1829
+fin_validacion = 2016-04-24   # d_1913 (3 ventanas de 28 días)
+fin_test = 2016-05-22         # d_1941 (28 días)
+
+[carga]
+filas_por_bloque = 3049       # series por bloque al leer las ventas (un bloque ~ una tienda)
+
+[muestra_eda]
+estratos = ["dept_id", "store_id"]
+fraccion = 0.10
+semilla = 42
+
+# Análisis exploratorio
+[eda]
+ventana_previa_evento = 2     # días previos a un evento que se tratan como "previos" (registro, N5)
+
+# Detección de outliers serie a serie (solo se marcan, nunca se eliminan)
+[outliers]
+k_mad = 5                     # umbral = mediana + k x max(1,4826 x MAD, 1) de las ventas > 0 de la serie
+minimo_dias_con_venta = 10    # series con menos días con venta no se evalúan
+k_sensibilidad = [3, 8]       # solo se informa del número de outliers con estos k
+ventanas_previas_comparacion = [3]   # ventanas previas alternativas para comparar el contexto
+
+# Posible salida de venta (registro, D7): criterio doble, (1 - 1/ADI)^L < umbral_probabilidad
+# y L >= L_minimo_dias, con L = días desde la última venta hasta el fin de train.
+# Solo se marca; no cambia la clasificación.
+[salida_venta]
+umbral_probabilidad = 0.01
+L_minimo_dias = 28
+
+# Criterio de Syntetos, Boylan y Croston (Anexo A de requisitos.md)
+[clasificacion]
+umbral_adi = 1.32
+umbral_cv2 = 0.49

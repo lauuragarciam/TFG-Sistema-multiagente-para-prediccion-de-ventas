@@ -13,7 +13,7 @@
 ## Datos y división
 - Valores exactos de la división (fechas de corte, número de ventanas de validación): a la configuración y a la memoria. Con 3 ventanas de 28 días hay 8 series sin historial en entrenamiento y los cuatro tipos de evento aparecen en validación.
 - Los eventos concretos de test no aparecen en validación con ninguna cantidad razonable de ventanas. Los tipos de test (cultural y religioso) tienen solo 3 días cada uno en validación.
-- Cifras de las comprobaciones: 0 series sin ventas, 1 con una sola venta, ninguna serie vende antes de su primer precio y no hay huecos de precio intermedios.
+- Ninguna serie vende antes de su primer precio y no hay huecos de precio intermedios.
 
 ## Evaluación
 - Test de 28 días en un único periodo (abril-mayo de 2016) con solo 4 días de evento: las conclusiones por contexto, y sobre el agente de eventos, tienen baja confianza estadística.
